@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">SafeYOU-Helper</string>
+    <string name="developed_by_mark_46">Developed by MARK-46, © 2024</string>
+    <string name="help_button">Hold to Call for Help</string>
+    <string name="app_desc">Prototype of the \"Help\" button based WebSocket technology.</string>
+    <string name="empty">- - -</string>
+</resources>
