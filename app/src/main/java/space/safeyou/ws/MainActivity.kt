@@ -4,13 +4,13 @@ import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.DialogInterface
 import android.graphics.Color
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.util.Log
 import android.view.View
+import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.util.Consumer
@@ -28,9 +28,12 @@ class MainActivity : AppCompatActivity(), WSClient.WSEvents {
     private lateinit var vibro: Vibrator
     private lateinit var client: WSClient
     private lateinit var helpButton: MaterialButton
+    private lateinit var connectButton: MaterialButton
     private lateinit var statusView: TextView
     private lateinit var pingTimeView: TextView
     private lateinit var infoView: TextView
+    private lateinit var urlInput: EditText
+    private lateinit var countryInput: EditText
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,6 +43,8 @@ class MainActivity : AppCompatActivity(), WSClient.WSEvents {
 
         pingTimeView = findViewById(R.id.ping_time_view)
         infoView = findViewById(R.id.info_view)
+        urlInput = findViewById(R.id.url_input)
+        countryInput = findViewById(R.id.country_input)
 
         statusView = findViewById(R.id.status_view)
         statusView.text = "WS-Disconnected"
@@ -47,11 +52,19 @@ class MainActivity : AppCompatActivity(), WSClient.WSEvents {
 
         helpButton = findViewById(R.id.help_me_button)
         helpButton.setOnLongClickListener(this::onLongPressHelpME)
+        helpButton.isEnabled = false
+
+        connectButton = findViewById(R.id.connect_button)
+        connectButton.setOnClickListener(this::onPressConnect)
+    }
+
+    private fun onPressConnect(view: View) {
+        connectButton.isEnabled = false
+        helpButton.isEnabled = true
 
         // Create WebSocket client options
-        val token = "002202eb53c9fb477710d872d591b75c5bf0f9057af77b8a5f3e42674e01fc534a263f846685429a"
         val options = WSOptions.init()
-            .setUrl("wss://sydeveloper.com:41/ws?token=$token") // URL to connect to the WebSocket server with an access token
+            .setUrl(urlInput.text.toString()) // URL to connect to the WebSocket server with an access token
             .setProtocol("SafeYOU") // Protocol to use for WebSocket communication
             .setDebugMode(true) // Flag to enable debug mode for logging WebSocket client actions
         client = WSClient(options, this)
@@ -69,7 +82,7 @@ class MainActivity : AppCompatActivity(), WSClient.WSEvents {
                     .put("coordinates", "40.7657796,43.8338588")
                     .put("address", "Lalayan St, Gyumri, Armenia")
                     .put("message", "Please help me!!!")
-                    .put("country_code", "arm")
+                    .put("country_code", countryInput.text.toString())
                     .put("language_code", "en")
             )
 
@@ -102,6 +115,13 @@ class MainActivity : AppCompatActivity(), WSClient.WSEvents {
         // Called when disconnected from the server
         // Add logic here that executes when disconnected from the server
         setStatusText("WS-Disconnected\n[$code] $reason", Color.RED)
+
+        runOnUiThread {
+            run {
+                helpButton.isEnabled = false
+                connectButton.isEnabled = true
+            }
+        }
     }
 
     override fun onReceivedPacket(client: WSClient?, packet: WSPacket) {
@@ -162,6 +182,14 @@ class MainActivity : AppCompatActivity(), WSClient.WSEvents {
         // Called when an error occurs
         // Add logic here to handle errors
         Log.d(TAG, "onError: " + exception?.message)
+
+
+        runOnUiThread {
+            run {
+                helpButton.isEnabled = false
+                connectButton.isEnabled = true
+            }
+        }
     }
 
     override fun onPingTime(client: WSClient?, milliseconds: Long) {
