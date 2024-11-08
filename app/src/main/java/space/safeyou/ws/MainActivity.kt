@@ -26,7 +26,6 @@ class MainActivity : AppCompatActivity(), WSClient.WSEvents {
     private var TAG: String = "DemoMainActivity"
 
     private lateinit var vibro: Vibrator
-    private lateinit var client: WSClient
     private lateinit var helpButton: MaterialButton
     private lateinit var connectButton: MaterialButton
     private lateinit var statusView: TextView
@@ -34,6 +33,7 @@ class MainActivity : AppCompatActivity(), WSClient.WSEvents {
     private lateinit var infoView: TextView
     private lateinit var urlInput: EditText
     private lateinit var countryInput: EditText
+    private var client: WSClient? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,6 +62,8 @@ class MainActivity : AppCompatActivity(), WSClient.WSEvents {
         connectButton.isEnabled = false
         helpButton.isEnabled = true
 
+        client?.disconnect(0, "")
+
         // Create WebSocket client options
         val options = WSOptions.init()
             .setUrl(urlInput.text.toString()) // URL to connect to the WebSocket server with an access token
@@ -69,7 +71,7 @@ class MainActivity : AppCompatActivity(), WSClient.WSEvents {
             .setDebugMode(true) // Flag to enable debug mode for logging WebSocket client actions
         client = WSClient(options, this)
 
-        client.connect()
+        client?.connect()
     }
 
     private fun onLongPressHelpME(view: View): Boolean {
@@ -87,7 +89,7 @@ class MainActivity : AppCompatActivity(), WSClient.WSEvents {
             )
 
         // This method sends JSON data to the server.
-        client.sendPacket(data)
+        client?.sendPacket(data)
 
         // This method sends JSON data along with file content as bytes to the server.
         // client.sendPacket(data, "YOUR FILE CONTENT".toByteArray())
