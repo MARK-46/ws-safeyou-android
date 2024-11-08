@@ -5,9 +5,7 @@
     04-12-2023 18:26:23
 ~~~
 
-<video height="759" controls autoplay>
-  <source src="video.mp4" type="video/mp4">
-</video>
+<img src="video.gif" alt="Screenshot" height="759" />
 
 ---
 
